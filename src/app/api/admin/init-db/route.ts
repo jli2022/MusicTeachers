@@ -58,87 +58,68 @@ export async function POST(request: NextRequest) {
     if (createDemoUsers) {
       console.log('🧪 Creating demo test users...')
       
-      // Create pending teacher
-      try {
-        const pendingPassword = await bcrypt.hash('pending123', 12)
-        
-        await prisma.user.create({
-          data: {
-            email: 'pending.teacher@test.com',
-            name: 'Pending Teacher',
-            password: pendingPassword,
-            role: 'TEACHER',
-            isActive: true,
-            approvalStatus: 'PENDING',
-            teacher: {
-              create: {
-                instruments: ['Piano', 'Guitar'],
-                qualifications: 'Bachelor of Music, Teaching Diploma'
-              }
-            }
+      const demoUsers = [
+        {
+          email: 'approved.teacher@test.com',
+          name: 'Approved Teacher',
+          password: 'approved123',
+          role: 'TEACHER' as const,
+          approvalStatus: 'APPROVED' as const,
+          approvalDate: new Date(),
+          teacher: {
+            instruments: ['Piano', 'Saxophone'],
+            qualifications: 'Master of Music Performance'
           }
-        })
-        console.log('✅ Created pending test teacher')
-      } catch (error: unknown) {
-        if ((error as PrismaError).code !== 'P2002') { // Ignore unique constraint errors
-          console.log('⚠️ Error creating pending teacher:', (error as Error).message)
+        },
+        {
+          email: 'pending.teacher@test.com',
+          name: 'Pending Teacher',
+          password: 'pending123',
+          role: 'TEACHER' as const,
+          approvalStatus: 'PENDING' as const,
+          teacher: {
+            instruments: ['Piano', 'Guitar']
+          }
+        },
+        {
+          email: 'rejected.teacher@test.com',
+          name: 'Rejected Teacher',
+          password: 'rejected123',
+          role: 'TEACHER' as const,
+          approvalStatus: 'REJECTED' as const,
+          approvalDate: new Date(),
+          rejectionReason: 'Incomplete documentation',
+          teacher: {
+            instruments: ['Violin']
+          }
         }
-      }
+      ]
 
-      // Create rejected teacher
-      try {
-        const rejectedPassword = await bcrypt.hash('rejected123', 12)
-        
-        await prisma.user.create({
-          data: {
-            email: 'rejected.teacher@test.com',
-            name: 'Rejected Teacher',
-            password: rejectedPassword,
-            role: 'TEACHER',
-            isActive: true,
-            approvalStatus: 'REJECTED',
-            approvalDate: new Date(),
-            rejectionReason: 'Incomplete WWC documentation and missing qualifications',
-            teacher: {
-              create: {
-                instruments: ['Violin']
+      // Use lower hash rounds for faster creation
+      for (const userData of demoUsers) {
+        try {
+          const hashedPassword = await bcrypt.hash(userData.password, 8) // Reduced from 12 to 8
+          
+          await prisma.user.create({
+            data: {
+              email: userData.email,
+              name: userData.name,
+              password: hashedPassword,
+              role: userData.role,
+              isActive: true,
+              approvalStatus: userData.approvalStatus,
+              approvalDate: userData.approvalDate,
+              rejectionReason: userData.rejectionReason,
+              teacher: {
+                create: userData.teacher
               }
             }
+          })
+          console.log(`✅ Created ${userData.approvalStatus.toLowerCase()} teacher: ${userData.email}`)
+        } catch (error: unknown) {
+          if ((error as PrismaError).code !== 'P2002') { // Ignore unique constraint errors
+            console.log(`⚠️ Error creating ${userData.email}:`, (error as Error).message)
           }
-        })
-        console.log('✅ Created rejected test teacher')
-      } catch (error: unknown) {
-        if ((error as PrismaError).code !== 'P2002') { // Ignore unique constraint errors
-          console.log('⚠️ Error creating rejected teacher:', (error as Error).message)
-        }
-      }
-
-      // Create additional approved teacher
-      try {
-        const approvedPassword = await bcrypt.hash('approved123', 12)
-        
-        await prisma.user.create({
-          data: {
-            email: 'approved.teacher@test.com',
-            name: 'Approved Teacher',
-            password: approvedPassword,
-            role: 'TEACHER',
-            isActive: true,
-            approvalStatus: 'APPROVED',
-            approvalDate: new Date(),
-            teacher: {
-              create: {
-                instruments: ['Piano', 'Saxophone', 'Flute'],
-                qualifications: 'Master of Music Performance, Advanced Teaching Certification',
-                experience: '8+ years teaching experience with students of all ages'
-              }
-            }
-          }
-        })
-        console.log('✅ Created approved test teacher')
-      } catch (error: unknown) {
-        if ((error as PrismaError).code !== 'P2002') { // Ignore unique constraint errors
-          console.log('⚠️ Error creating approved teacher:', (error as Error).message)
         }
       }
     }
