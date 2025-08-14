@@ -5,7 +5,23 @@ import { useState } from 'react'
 export default function DebugAuth() {
   const [email, setEmail] = useState('approved.teacher@test.com')
   const [password, setPassword] = useState('approved123')
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{
+    success: boolean;
+    user?: {
+      id: string;
+      email: string;
+      name: string | null;
+      role: string | null;
+      approvalStatus: string;
+      approvalDate: Date | null;
+      rejectionReason: string | null;
+      hasPassword: boolean;
+      passwordValid: boolean;
+      isActive: boolean;
+    };
+    error?: string;
+    details?: string;
+  } | null>(null)
   const [loading, setLoading] = useState(false)
 
   const testAuth = async () => {
@@ -19,7 +35,11 @@ export default function DebugAuth() {
       const data = await response.json()
       setResult(data)
     } catch (error) {
-      setResult({ error: 'Network error', details: error })
+      setResult({ 
+        success: false, 
+        error: 'Network error', 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      })
     } finally {
       setLoading(false)
     }
