@@ -125,9 +125,8 @@ export default function TestWWC() {
                   </div>
                   <button
                     onClick={() => runTest({ 
-                      state: format.state, 
-                      number: format.example, 
-                      expiry: '2025-12-31' 
+                      wwcNumber: format.example, 
+                      expiryDate: '2025-12-31' 
                     })}
                     className="text-indigo-600 hover:text-indigo-800 text-sm underline"
                   >
