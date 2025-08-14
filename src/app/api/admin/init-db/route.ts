@@ -13,15 +13,16 @@ export async function POST(request: NextRequest) {
     // Check if user is admin or if this is initial setup
     const session = await getServerSession(authOptions)
     
-    // Allow initialization if no users exist yet OR if user is admin
+    // Allow initialization if no admin users exist yet OR if user is admin
     const userCount = await prisma.user.count()
-    const isInitialSetup = userCount === 0
+    const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
+    const isInitialSetup = adminCount === 0
     
-    console.log(`Database check: ${userCount} users found, isInitialSetup: ${isInitialSetup}`)
+    console.log(`Database check: ${userCount} total users, ${adminCount} admin users, isInitialSetup: ${isInitialSetup}`)
     
     if (!isInitialSetup && (!session || session.user.role !== 'ADMIN')) {
       return NextResponse.json(
-        { error: `Unauthorized. Only admins can initialize database. Found ${userCount} users.` },
+        { error: `Unauthorized. Only admins can initialize database. Found ${adminCount} admin users.` },
         { status: 401 }
       )
     }
