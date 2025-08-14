@@ -37,14 +37,15 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Create user with TEACHER role only
+    // Create user with TEACHER role only - PENDING approval by default
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
         role: 'TEACHER',
-        isActive: true
+        isActive: true,
+        approvalStatus: 'PENDING'
       }
     })
 
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json(
-      { message: 'Teacher account created successfully' },
+      { message: 'Teacher account created successfully. Your registration is pending approval by an administrator.' },
       { status: 201 }
     )
   } catch (error) {

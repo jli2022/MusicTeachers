@@ -30,7 +30,7 @@ export default function SignUp() {
       })
 
       if (response.ok) {
-        router.push('/auth/signin?message=Teacher account created successfully')
+        router.push('/auth/signin?message=Teacher account created successfully. Your registration is pending approval by an administrator.')
       } else {
         const data = await response.json()
         setError(data.error || 'Something went wrong')

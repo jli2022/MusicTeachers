@@ -49,6 +49,14 @@ const buildProviders = () => {
           throw new Error('Account is not active. Please contact an administrator.')
         }
 
+        if (user.approvalStatus === 'PENDING') {
+          throw new Error('Your account is pending approval. Please wait for administrator approval.')
+        }
+
+        if (user.approvalStatus === 'REJECTED') {
+          throw new Error('Your account registration has been rejected. Please contact an administrator.')
+        }
+
         return {
           id: user.id,
           email: user.email!,
@@ -87,13 +95,13 @@ export const authOptions: NextAuthOptions = {
         return true
       }
       
-      // For credentials, check if user is active
+      // For credentials, check if user is active and approved
       if (account?.provider === 'credentials') {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email! }
         })
         
-        if (!existingUser?.isActive) {
+        if (!existingUser?.isActive || existingUser?.approvalStatus !== 'APPROVED') {
           return false
         }
       }
@@ -106,13 +114,14 @@ export const authOptions: NextAuthOptions = {
           where: { id: user.id }
         })
         
-        // If this is a new Google OAuth user, set them up as a teacher
+        // If this is a new Google OAuth user, set them up as a teacher (PENDING approval)
         if (account?.provider === 'google' && dbUser && !dbUser.role) {
           await prisma.user.update({
             where: { id: user.id },
             data: { 
               role: 'TEACHER',
-              isActive: true 
+              isActive: true,
+              approvalStatus: 'PENDING'
             }
           })
           
@@ -125,9 +134,11 @@ export const authOptions: NextAuthOptions = {
           
           token.role = 'TEACHER'
           token.isActive = true
+          token.approvalStatus = 'PENDING'
         } else {
           token.role = dbUser?.role || undefined
           token.isActive = dbUser?.isActive || false
+          token.approvalStatus = dbUser?.approvalStatus || undefined
         }
       }
       return token
@@ -137,6 +148,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub!
         session.user.role = token.role as string
         session.user.isActive = token.isActive as boolean
+        session.user.approvalStatus = token.approvalStatus as string
       }
       return session
     },

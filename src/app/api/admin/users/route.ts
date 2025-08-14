@@ -23,11 +23,15 @@ export async function GET() {
         role: true,
         isActive: true,
         createdAt: true,
-        approvedBy: true
+        approvedBy: true,
+        approvalStatus: true,
+        approvalDate: true,
+        rejectionReason: true
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: [
+        { approvalStatus: 'asc' }, // PENDING first
+        { createdAt: 'desc' }
+      ]
     })
 
     return NextResponse.json(users)
@@ -76,7 +80,9 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         role: role as 'TEACHER' | 'EMPLOYER' | 'ADMIN',
         isActive: true,
+        approvalStatus: 'APPROVED',
         approvedBy: session.user.id,
+        approvalDate: new Date(),
         emailVerified: new Date()
       }
     })

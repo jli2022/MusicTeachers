@@ -34,6 +34,12 @@ enum ApplicationStatus {
   REJECTED
 }
 
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -65,17 +71,20 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  role          UserRole?
-  password      String?
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  isActive      Boolean   @default(true)
-  approvedBy    String?   // Admin who approved this user
+  id             String         @id @default(cuid())
+  email          String         @unique
+  name           String?
+  role           UserRole?
+  password       String?
+  emailVerified  DateTime?
+  image          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  isActive       Boolean        @default(true)
+  approvalStatus ApprovalStatus @default(PENDING)
+  approvedBy     String?        // Admin who approved/rejected this user
+  approvalDate   DateTime?      // When approval decision was made
+  rejectionReason String?       // Reason for rejection
 
   accounts Account[]
   sessions Session[]
