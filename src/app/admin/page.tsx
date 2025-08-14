@@ -79,7 +79,7 @@ export default function AdminDashboard() {
         const data = await response.json()
         alert(data.error || 'Failed to create user')
       }
-    } catch (error) {
+    } catch {
       alert('Failed to create user')
     }
   }
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
         const data = await response.json()
         alert(data.error || 'Failed to approve user')
       }
-    } catch (error) {
+    } catch {
       alert('Failed to approve user')
     }
   }
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
         const data = await response.json()
         alert(data.error || 'Failed to reject user')
       }
-    } catch (error) {
+    } catch {
       alert('Failed to reject user')
     }
   }
@@ -385,7 +385,7 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h3 className="text-lg font-semibold mb-4 text-red-800">Reject User Registration</h3>
               <p className="text-sm text-gray-600 mb-4">
-                Please provide a reason for rejecting this user's registration. This will help them understand why their application was declined.
+                Please provide a reason for rejecting this user&apos;s registration. This will help them understand why their application was declined.
               </p>
               <div className="space-y-4">
                 <div>

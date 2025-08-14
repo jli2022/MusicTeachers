@@ -53,7 +53,7 @@ export default function TeacherLogin() {
 
       // Redirect to teacher dashboard
       router.push('/dashboard')
-    } catch (err) {
+    } catch {
       setError('An error occurred during login')
       setLoading(false)
     }
@@ -71,7 +71,7 @@ export default function TeacherLogin() {
         setError('Google sign-in failed')
         setLoading(false)
       }
-    } catch (err) {
+    } catch {
       setError('Google sign-in failed')
       setLoading(false)
     }
@@ -192,7 +192,7 @@ export default function TeacherLogin() {
         {/* Footer Links */}
         <div className="text-center space-y-2">
           <p className="text-sm text-gray-600">
-            Don't have a teacher account?{' '}
+            Don&apos;t have a teacher account?{' '}
             <Link href="/auth/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
               Apply to become a teacher
             </Link>

@@ -9,7 +9,7 @@ function SignInForm() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [providers, setProviders] = useState<Record<string, unknown> | null>(null)
+  const [, setProviders] = useState<Record<string, unknown> | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
@@ -43,7 +43,7 @@ function SignInForm() {
       } else {
         router.push(callbackUrl)
       }
-    } catch (error) {
+    } catch {
       setError('Something went wrong')
     } finally {
       setIsLoading(false)
@@ -62,8 +62,7 @@ function SignInForm() {
       } else if (result?.url) {
         window.location.href = result.url
       }
-    } catch (error) {
-      console.error('Google sign-in error:', error)
+    } catch {
       setError('Google sign-in failed. Please try again or use credentials.')
     }
   }

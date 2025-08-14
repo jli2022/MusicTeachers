@@ -62,7 +62,7 @@ export default function ManagementPortal() {
         setError('Access denied. Please contact an administrator.')
         setLoading(false)
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred during login')
       setLoading(false)
     }

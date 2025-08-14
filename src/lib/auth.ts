@@ -88,7 +88,7 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt'
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === 'google') {
         // For Google OAuth, just validate that the user should be allowed to sign in
         // Let NextAuth handle user creation via the adapter

@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import WWCInput from '@/components/WWCInput'
-import { validateWWC } from '@/lib/wwc-validation'
+// import { validateWWC } from '@/lib/wwc-validation'
 import Link from 'next/link'
 
 interface TeacherProfile {

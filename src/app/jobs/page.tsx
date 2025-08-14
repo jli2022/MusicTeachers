@@ -39,8 +39,8 @@ export default function Jobs() {
         const data = await response.json()
         setJobs(data)
       }
-    } catch (error) {
-      console.error('Error fetching jobs:', error)
+    } catch {
+      console.error('Error fetching jobs')
     } finally {
       setLoading(false)
     }
@@ -72,7 +72,7 @@ export default function Jobs() {
           alert(data.error || 'Failed to submit application')
         }
       }
-    } catch (error) {
+    } catch {
       alert('Failed to submit application')
     }
   }
