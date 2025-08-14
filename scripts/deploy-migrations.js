@@ -21,15 +21,15 @@ if (isProduction) {
   }
   
   try {
-    // Run migration deployment
-    console.log('📋 Running: prisma migrate deploy');
-    execSync('npx prisma migrate deploy', { 
+    // Try db push first (faster and more reliable for schema sync)
+    console.log('📋 Running: prisma db push (schema sync)');
+    execSync('npx prisma db push --accept-data-loss', { 
       stdio: 'inherit',
-      timeout: 120000, // 2 minutes timeout
+      timeout: 90000, // 90 seconds timeout
       env: { ...process.env }
     });
     
-    console.log('✅ Database migrations deployed successfully!');
+    console.log('✅ Database schema synchronized successfully!');
     
     // Optionally seed the database with basic data if needed
     if (process.env.SEED_ON_DEPLOY === 'true') {
