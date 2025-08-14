@@ -17,9 +17,11 @@ export async function POST(request: NextRequest) {
     const userCount = await prisma.user.count()
     const isInitialSetup = userCount === 0
     
+    console.log(`Database check: ${userCount} users found, isInitialSetup: ${isInitialSetup}`)
+    
     if (!isInitialSetup && (!session || session.user.role !== 'ADMIN')) {
       return NextResponse.json(
-        { error: 'Unauthorized. Only admins can initialize database.' },
+        { error: `Unauthorized. Only admins can initialize database. Found ${userCount} users.` },
         { status: 401 }
       )
     }
