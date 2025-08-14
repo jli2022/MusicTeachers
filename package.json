@@ -6,14 +6,15 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "build:docker": "NEXT_SKIP_LINT=true next build",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && npm run db:deploy",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:deploy": "node scripts/deploy-migrations.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",

@@ -25,7 +25,9 @@ async function main() {
         role: 'ADMIN',
         password: hashedPassword,
         isActive: true,
-        emailVerified: new Date()
+        emailVerified: new Date(),
+        approvalStatus: 'APPROVED',
+        approvalDate: new Date()
       }
     })
 
@@ -52,7 +54,9 @@ async function main() {
         role: 'TEACHER',
         password: teacherPassword,
         isActive: true,
-        emailVerified: new Date()
+        emailVerified: new Date(),
+        approvalStatus: 'APPROVED',
+        approvalDate: new Date()
       }
     })
 
@@ -90,6 +94,8 @@ async function main() {
         password: employerPassword,
         isActive: true,
         emailVerified: new Date(),
+        approvalStatus: 'APPROVED',
+        approvalDate: new Date(),
         approvedBy: adminUserId
       }
     })

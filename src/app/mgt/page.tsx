@@ -175,7 +175,7 @@ export default function ManagementPortal() {
               <span className="font-medium text-blue-700">Employer Demo:</span>
               <span className="text-blue-600">staff@musicteachers.com</span>
             </div>
-            <p className="text-xs text-gray-500 mt-2">Password for both: admin123</p>
+            <p className="text-xs text-gray-500 mt-2">Admin password: admin123 | Employer password: employer123</p>
           </div>
         </div>
 
