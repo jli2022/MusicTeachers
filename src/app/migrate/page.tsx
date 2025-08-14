@@ -4,7 +4,12 @@ import { useState } from 'react'
 
 export default function MigrateSchema() {
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{
+    success: boolean;
+    message: string;
+    testResult: string;
+    sampleData: unknown;
+  } | null>(null)
   const [error, setError] = useState('')
 
   const runMigration = async () => {
@@ -43,7 +48,7 @@ export default function MigrateSchema() {
           </h1>
           
           <p className="text-gray-600 mb-8">
-            This will add the approval system columns to the production database if they don't exist.
+            This will add the approval system columns to the production database if they don&apos;t exist.
             Run this BEFORE initializing the database.
           </p>
 
@@ -85,7 +90,7 @@ export default function MigrateSchema() {
           <div className="mt-8 pt-6 border-t border-gray-200">
             <h3 className="text-sm font-medium text-gray-900 mb-2">What this does:</h3>
             <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
-              <li>Creates ApprovalStatus enum if it doesn't exist</li>
+              <li>Creates ApprovalStatus enum if it doesn&apos;t exist</li>
               <li>Adds approvalStatus column with PENDING default</li>
               <li>Adds approvedBy, approvalDate, rejectionReason columns</li>
               <li>Safe to run multiple times (checks if columns exist first)</li>
