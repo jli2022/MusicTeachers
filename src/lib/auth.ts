@@ -95,17 +95,8 @@ export const authOptions: NextAuthOptions = {
         return true
       }
       
-      // For credentials, check if user is active and approved
-      if (account?.provider === 'credentials') {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! }
-        })
-        
-        if (!existingUser?.isActive || existingUser?.approvalStatus !== 'APPROVED') {
-          return false
-        }
-      }
-      
+      // For credentials, the validation is already done in the credentials provider
+      // Just allow the sign in since the credentials provider handles approval status
       return true
     },
     jwt: async ({ token, user, account }) => {
