@@ -15,6 +15,7 @@ export default function InitDatabase() {
     demoAccounts?: {
       admin: string;
       employer: string;
+      approvedTeacher: string;
       pendingTeacher: string;
       rejectedTeacher: string;
     };
@@ -110,6 +111,7 @@ export default function InitDatabase() {
                       <ul className="list-disc list-inside ml-4">
                         <li>Admin: {result.demoAccounts.admin}</li>
                         <li>Employer: {result.demoAccounts.employer}</li>
+                        <li>Approved Teacher: {result.demoAccounts.approvedTeacher}</li>
                         <li>Pending Teacher: {result.demoAccounts.pendingTeacher}</li>
                         <li>Rejected Teacher: {result.demoAccounts.rejectedTeacher}</li>
                       </ul>

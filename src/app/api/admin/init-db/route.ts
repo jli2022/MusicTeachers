@@ -26,10 +26,10 @@ export async function POST(request: NextRequest) {
 
     console.log('🔧 Starting database initialization...')
     
-    // Update existing users to have approval fields if they don't
+    // Update existing users without approval date to be approved
     const usersNeedingUpdate = await prisma.user.findMany({
       where: {
-        approvalStatus: null
+        approvalDate: null
       }
     })
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       
       await prisma.user.updateMany({
         where: {
-          approvalStatus: null
+          approvalDate: null
         },
         data: {
           approvalStatus: 'APPROVED',
@@ -109,6 +109,35 @@ export async function POST(request: NextRequest) {
           console.log('⚠️ Error creating rejected teacher:', (error as Error).message)
         }
       }
+
+      // Create additional approved teacher
+      try {
+        const approvedPassword = await bcrypt.hash('approved123', 12)
+        
+        await prisma.user.create({
+          data: {
+            email: 'approved.teacher@test.com',
+            name: 'Approved Teacher',
+            password: approvedPassword,
+            role: 'TEACHER',
+            isActive: true,
+            approvalStatus: 'APPROVED',
+            approvalDate: new Date(),
+            teacher: {
+              create: {
+                instruments: ['Piano', 'Saxophone', 'Flute'],
+                qualifications: 'Master of Music Performance, Advanced Teaching Certification',
+                experience: '8+ years teaching experience with students of all ages'
+              }
+            }
+          }
+        })
+        console.log('✅ Created approved test teacher')
+      } catch (error: unknown) {
+        if ((error as PrismaError).code !== 'P2002') { // Ignore unique constraint errors
+          console.log('⚠️ Error creating approved teacher:', (error as Error).message)
+        }
+      }
     }
 
     const finalUserCount = await prisma.user.count()
@@ -128,6 +157,7 @@ export async function POST(request: NextRequest) {
       demoAccounts: createDemoUsers ? {
         admin: 'admin@musicteachers.com / admin123',
         employer: 'staff@musicteachers.com / employer123',
+        approvedTeacher: 'approved.teacher@test.com / approved123',
         pendingTeacher: 'pending.teacher@test.com / pending123',
         rejectedTeacher: 'rejected.teacher@test.com / rejected123'
       } : null
