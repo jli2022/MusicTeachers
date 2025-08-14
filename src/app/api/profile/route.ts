@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { validateWWC } from '@/lib/wwc-validation'
 
 export async function GET() {
   try {
@@ -68,6 +69,26 @@ export async function PUT(request: NextRequest) {
       qualifications,
       experience
     } = await request.json()
+
+    // Validate WWC if provided
+    if (wwcNumber && wwcExpiry) {
+      const wwcValidation = validateWWC(wwcNumber, wwcExpiry)
+      if (!wwcValidation.isValid) {
+        return NextResponse.json(
+          { 
+            error: 'Invalid WWC details',
+            details: wwcValidation.errors,
+            wwcStatus: wwcValidation.status
+          },
+          { status: 400 }
+        )
+      }
+
+      // Warn if WWC is expiring soon but allow saving
+      if (wwcValidation.status === 'Expiring Soon') {
+        console.warn(`Teacher ${session.user.id} WWC expiring in ${wwcValidation.daysUntilExpiry} days`)
+      }
+    }
 
     const teacher = await prisma.teacher.findUnique({
       where: {

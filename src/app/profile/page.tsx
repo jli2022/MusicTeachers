@@ -3,6 +3,8 @@
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import WWCInput from '@/components/WWCInput'
+import { validateWWC } from '@/lib/wwc-validation'
 import Link from 'next/link'
 
 interface TeacherProfile {
@@ -292,36 +294,14 @@ export default function TeacherProfile() {
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Working with Children Check</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="wwcNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                    WWC Number
-                  </label>
-                  <input
-                    type="text"
-                    id="wwcNumber"
-                    name="wwcNumber"
-                    value={formData.wwcNumber}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="WWC123456789"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="wwcExpiry" className="block text-sm font-medium text-gray-700 mb-2">
-                    WWC Expiry Date
-                  </label>
-                  <input
-                    type="date"
-                    id="wwcExpiry"
-                    name="wwcExpiry"
-                    value={formData.wwcExpiry}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
+              <WWCInput
+                wwcNumber={formData.wwcNumber}
+                wwcExpiry={formData.wwcExpiry}
+                onWWCNumberChange={(value) => setFormData(prev => ({ ...prev, wwcNumber: value }))}
+                onWWCExpiryChange={(value) => setFormData(prev => ({ ...prev, wwcExpiry: value }))}
+                showValidation={true}
+                required={true}
+              />
             </div>
 
             {/* Teaching Information */}
