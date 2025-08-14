@@ -60,6 +60,26 @@ export async function POST(request: NextRequest) {
       
       const demoUsers = [
         {
+          email: 'admin@musicteachers.com',
+          name: 'Admin User',
+          password: 'admin123',
+          role: 'ADMIN' as const,
+          approvalStatus: 'APPROVED' as const,
+          approvalDate: new Date()
+        },
+        {
+          email: 'staff@musicteachers.com',
+          name: 'Staff Employer',
+          password: 'employer123',
+          role: 'EMPLOYER' as const,
+          approvalStatus: 'APPROVED' as const,
+          approvalDate: new Date(),
+          employer: {
+            organization: 'Music Academy Demo',
+            phone: '+1234567890'
+          }
+        },
+        {
           email: 'approved.teacher@test.com',
           name: 'Approved Teacher',
           password: 'approved123',
@@ -100,22 +120,30 @@ export async function POST(request: NextRequest) {
         try {
           const hashedPassword = await bcrypt.hash(userData.password, 8) // Reduced from 12 to 8
           
-          await prisma.user.create({
-            data: {
-              email: userData.email,
-              name: userData.name,
-              password: hashedPassword,
-              role: userData.role,
-              isActive: true,
-              approvalStatus: userData.approvalStatus,
-              approvalDate: userData.approvalDate,
-              rejectionReason: userData.rejectionReason,
-              teacher: {
-                create: userData.teacher
-              }
-            }
-          })
-          console.log(`✅ Created ${userData.approvalStatus.toLowerCase()} teacher: ${userData.email}`)
+          const createData = {
+            email: userData.email,
+            name: userData.name,
+            password: hashedPassword,
+            role: userData.role,
+            isActive: true,
+            approvalStatus: userData.approvalStatus,
+            approvalDate: userData.approvalDate,
+            rejectionReason: userData.rejectionReason
+          }
+          
+          // Add role-specific profiles
+          if ('teacher' in userData && userData.teacher) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (createData as any).teacher = { create: userData.teacher }
+          }
+          if ('employer' in userData && userData.employer) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (createData as any).employer = { create: userData.employer }
+          }
+          
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await prisma.user.create({ data: createData as any })
+          console.log(`✅ Created ${userData.role.toLowerCase()}: ${userData.email}`)
         } catch (error: unknown) {
           if ((error as PrismaError).code !== 'P2002') { // Ignore unique constraint errors
             console.log(`⚠️ Error creating ${userData.email}:`, (error as Error).message)
