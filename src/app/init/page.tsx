@@ -4,7 +4,21 @@ import { useState } from 'react'
 
 export default function InitDatabase() {
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{
+    message: string;
+    stats: {
+      totalUsers: number;
+      pending: number;
+      approved: number;
+      rejected: number;
+    };
+    demoAccounts?: {
+      admin: string;
+      employer: string;
+      pendingTeacher: string;
+      rejectedTeacher: string;
+    };
+  } | null>(null)
   const [error, setError] = useState('')
 
   const initializeDatabase = async (createDemo: boolean) => {
@@ -28,7 +42,7 @@ export default function InitDatabase() {
       } else {
         setError(data.error || 'Initialization failed')
       }
-    } catch (err) {
+    } catch {
       setError('Network error occurred')
     } finally {
       setLoading(false)

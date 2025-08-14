@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import bcrypt from 'bcryptjs'
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,7 +53,6 @@ export async function POST(request: NextRequest) {
       
       // Create pending teacher
       try {
-        const bcrypt = require('bcryptjs')
         const pendingPassword = await bcrypt.hash('pending123', 12)
         
         await prisma.user.create({
@@ -72,15 +72,14 @@ export async function POST(request: NextRequest) {
           }
         })
         console.log('✅ Created pending test teacher')
-      } catch (error: any) {
-        if (error.code !== 'P2002') { // Ignore unique constraint errors
-          console.log('⚠️ Error creating pending teacher:', error.message)
+      } catch (error: unknown) {
+        if ((error as any).code !== 'P2002') { // Ignore unique constraint errors
+          console.log('⚠️ Error creating pending teacher:', (error as Error).message)
         }
       }
 
       // Create rejected teacher
       try {
-        const bcrypt = require('bcryptjs')
         const rejectedPassword = await bcrypt.hash('rejected123', 12)
         
         await prisma.user.create({
@@ -101,9 +100,9 @@ export async function POST(request: NextRequest) {
           }
         })
         console.log('✅ Created rejected test teacher')
-      } catch (error: any) {
-        if (error.code !== 'P2002') { // Ignore unique constraint errors
-          console.log('⚠️ Error creating rejected teacher:', error.message)
+      } catch (error: unknown) {
+        if ((error as any).code !== 'P2002') { // Ignore unique constraint errors
+          console.log('⚠️ Error creating rejected teacher:', (error as Error).message)
         }
       }
     }
