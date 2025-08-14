@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "build:docker": "NEXT_SKIP_LINT=true next build",
-    "postinstall": "prisma generate && npm run db:deploy",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
