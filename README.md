@@ -55,8 +55,12 @@ A platform connecting music teachers with job opportunities, built with Next.js 
    npm run dev
    ```
 
-5. **Visit the app:**
-   Open [http://localhost:3000](http://localhost:3000)
+5. **Configure Google OAuth (Optional):**
+   - See [GOOGLE-OAUTH-SETUP.md](GOOGLE-OAUTH-SETUP.md) for complete setup
+   - Create separate Google OAuth apps for local development and production
+
+6. **Visit the app:**
+   Open [http://localhost:3002](http://localhost:3002)
 
 ## MVP Features
 

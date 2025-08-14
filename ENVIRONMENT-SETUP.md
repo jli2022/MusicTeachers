@@ -15,9 +15,10 @@ DATABASE_URL="postgresql://postgres:postgres123@localhost:5432/musicteachers?sch
 NEXTAUTH_SECRET="local-development-secret-key-change-in-production"
 NEXTAUTH_URL="http://localhost:3002"
 
-# Google OAuth (optional for local testing)
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
+# Google OAuth for Local Development
+# See GOOGLE-OAUTH-SETUP.md for complete setup instructions
+GOOGLE_CLIENT_ID="your-local-dev-google-client-id"
+GOOGLE_CLIENT_SECRET="your-local-dev-google-client-secret"
 ```
 
 ### `.env.local` - Alternative Local Development
@@ -170,6 +171,15 @@ createdb musicteachers
 npm run db:push
 npm run db:seed
 ```
+
+## Google OAuth Configuration
+
+For detailed Google OAuth setup across environments, see **[GOOGLE-OAUTH-SETUP.md](GOOGLE-OAUTH-SETUP.md)**.
+
+**Quick Summary:**
+- **Local Development**: Create separate Google OAuth app for `localhost:3002`
+- **Production**: Create separate Google OAuth app for `https://music-teachers.vercel.app`
+- **Never share** OAuth credentials between environments
 
 ## Migration Between Environments
 

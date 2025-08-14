@@ -23,7 +23,10 @@ export default function AdminDashboard() {
     name: '',
     password: '',
     role: 'EMPLOYER',
-    organization: ''
+    organization: '',
+    phone: '',
+    instruments: '',
+    qualifications: ''
   })
   const router = useRouter()
 
@@ -63,7 +66,7 @@ export default function AdminDashboard() {
 
       if (response.ok) {
         setShowCreateForm(false)
-        setNewUser({ email: '', name: '', password: '', role: 'EMPLOYER', organization: '' })
+        setNewUser({ email: '', name: '', password: '', role: 'EMPLOYER', organization: '', phone: '', instruments: '', qualifications: '' })
         fetchUsers()
         alert('User created successfully!')
       } else {
@@ -121,16 +124,27 @@ export default function AdminDashboard() {
             onClick={() => setShowCreateForm(true)}
             className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
           >
-            Create Employer Account
+            Create User Account
           </button>
         </div>
 
         {/* Create User Form */}
         {showCreateForm && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <h3 className="text-lg font-semibold mb-4">Create Employer Account</h3>
+            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
+              <h3 className="text-lg font-semibold mb-4">Create User Account</h3>
               <form onSubmit={handleCreateUser} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Role</label>
+                  <select
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    value={newUser.role}
+                    onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                  >
+                    <option value="TEACHER">Teacher</option>
+                    <option value="EMPLOYER">Employer</option>
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Email</label>
                   <input
@@ -152,14 +166,54 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Organization</label>
+                  <label className="block text-sm font-medium text-gray-700">Phone</label>
                   <input
-                    type="text"
+                    type="tel"
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                    value={newUser.organization}
-                    onChange={(e) => setNewUser({ ...newUser, organization: e.target.value })}
+                    value={newUser.phone}
+                    onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
                   />
                 </div>
+                
+                {/* Employer-specific fields */}
+                {newUser.role === 'EMPLOYER' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Organization</label>
+                    <input
+                      type="text"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      value={newUser.organization}
+                      onChange={(e) => setNewUser({ ...newUser, organization: e.target.value })}
+                    />
+                  </div>
+                )}
+
+                {/* Teacher-specific fields */}
+                {newUser.role === 'TEACHER' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Instruments</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Piano, Guitar, Violin"
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                        value={newUser.instruments}
+                        onChange={(e) => setNewUser({ ...newUser, instruments: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Qualifications</label>
+                      <textarea
+                        placeholder="Teaching qualifications, degrees, certifications..."
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                        rows={3}
+                        value={newUser.qualifications}
+                        onChange={(e) => setNewUser({ ...newUser, qualifications: e.target.value })}
+                      />
+                    </div>
+                  </>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Password</label>
                   <input

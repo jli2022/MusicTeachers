@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email, name, password, role, organization } = await request.json()
+    const { email, name, password, role, organization, phone, instruments, qualifications } = await request.json()
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -74,19 +74,34 @@ export async function POST(request: NextRequest) {
         email,
         name,
         password: hashedPassword,
-        role: role as 'EMPLOYER' | 'ADMIN',
+        role: role as 'TEACHER' | 'EMPLOYER' | 'ADMIN',
         isActive: true,
         approvedBy: session.user.id,
         emailVerified: new Date()
       }
     })
 
-    // Create employer profile if role is EMPLOYER
+    // Create role-specific profiles
     if (role === 'EMPLOYER') {
       await prisma.employer.create({
         data: {
           userId: user.id,
-          organization: organization || null
+          organization: organization || null,
+          phone: phone || null
+        }
+      })
+    } else if (role === 'TEACHER') {
+      // Parse instruments string into array
+      const instrumentsArray = instruments ? 
+        instruments.split(',').map((inst: string) => inst.trim()).filter(Boolean) : 
+        []
+
+      await prisma.teacher.create({
+        data: {
+          userId: user.id,
+          phone: phone || null,
+          instruments: instrumentsArray,
+          qualifications: qualifications || null
         }
       })
     }
