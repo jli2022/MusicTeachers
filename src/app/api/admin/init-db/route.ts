@@ -4,6 +4,10 @@ import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 
+interface PrismaError extends Error {
+  code?: string
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Check if user is admin or if this is initial setup
@@ -73,7 +77,7 @@ export async function POST(request: NextRequest) {
         })
         console.log('✅ Created pending test teacher')
       } catch (error: unknown) {
-        if ((error as any).code !== 'P2002') { // Ignore unique constraint errors
+        if ((error as PrismaError).code !== 'P2002') { // Ignore unique constraint errors
           console.log('⚠️ Error creating pending teacher:', (error as Error).message)
         }
       }
@@ -101,7 +105,7 @@ export async function POST(request: NextRequest) {
         })
         console.log('✅ Created rejected test teacher')
       } catch (error: unknown) {
-        if ((error as any).code !== 'P2002') { // Ignore unique constraint errors
+        if ((error as PrismaError).code !== 'P2002') { // Ignore unique constraint errors
           console.log('⚠️ Error creating rejected teacher:', (error as Error).message)
         }
       }
