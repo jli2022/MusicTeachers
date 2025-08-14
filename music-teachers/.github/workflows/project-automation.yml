@@ -1,0 +1,152 @@
+name: 🚀 Project Automation
+
+on:
+  issues:
+    types: [opened, labeled, assigned]
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    steps:
+      - name: Auto-label issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body.toLowerCase();
+            
+            const labels = [];
+            
+            // Auto-label based on title/content
+            if (title.includes('[bug]') || body.includes('bug') || body.includes('error')) {
+              labels.push('bug');
+            }
+            
+            if (title.includes('[feature]') || body.includes('feature') || body.includes('enhancement')) {
+              labels.push('enhancement');
+            }
+            
+            if (title.includes('[task]') || body.includes('task') || body.includes('todo')) {
+              labels.push('task');
+            }
+            
+            // Priority labels
+            if (title.includes('urgent') || body.includes('urgent') || title.includes('critical')) {
+              labels.push('high-priority');
+            }
+            
+            // Component labels
+            if (body.includes('authentication') || body.includes('auth') || body.includes('login')) {
+              labels.push('authentication');
+            }
+            
+            if (body.includes('database') || body.includes('prisma') || body.includes('sql')) {
+              labels.push('database');
+            }
+            
+            if (body.includes('ui') || body.includes('frontend') || body.includes('design')) {
+              labels.push('ui/ux');
+            }
+            
+            if (body.includes('api') || body.includes('backend') || body.includes('server')) {
+              labels.push('backend');
+            }
+            
+            if (body.includes('docker') || body.includes('deployment') || body.includes('devops')) {
+              labels.push('deployment');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }
+
+  auto-assign-reviewers:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    steps:
+      - name: Auto-assign reviewers
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            // Skip if PR is a draft
+            if (pr.draft) return;
+            
+            // Auto-assign labels based on changed files
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+            
+            const labels = [];
+            const changedFiles = files.map(f => f.filename);
+            
+            if (changedFiles.some(f => f.includes('.tsx') || f.includes('.ts'))) {
+              labels.push('typescript');
+            }
+            
+            if (changedFiles.some(f => f.includes('prisma') || f.includes('.sql'))) {
+              labels.push('database');
+            }
+            
+            if (changedFiles.some(f => f.includes('docker') || f.includes('Dockerfile'))) {
+              labels.push('deployment');
+            }
+            
+            if (changedFiles.some(f => f.includes('auth') || f.includes('login'))) {
+              labels.push('authentication');
+            }
+            
+            if (changedFiles.some(f => f.includes('.md') || f.includes('README'))) {
+              labels.push('documentation');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: labels
+              });
+            }
+
+  update-todo:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'closed'
+    steps:
+      - name: Update TODO.md when issue is closed
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            
+            // Only process issues that were created from TODO
+            if (!issue.body.includes('Auto-generated from TODO.md')) return;
+            
+            // Create a comment suggesting TODO.md update
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `✅ **Task Completed!**
+              
+            Don't forget to update the corresponding item in TODO.md:
+            - Change \`- [ ]\` to \`- [x]\` or \`✅\`
+            - Consider creating a follow-up issue if needed
+            
+            Great work! 🎉`
+            });

@@ -1,0 +1,110 @@
+name: 📋 TODO to Issues
+
+on:
+  workflow_dispatch:
+    inputs:
+      section:
+        description: 'Which TODO section to process'
+        required: true
+        default: 'High Priority'
+        type: choice
+        options:
+          - 'High Priority'
+          - 'Medium Priority'
+          - 'Low Priority'
+          - 'Known Issues'
+          - 'Security & Compliance'
+          - 'Features & Enhancements'
+          - 'All'
+      
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Issues from TODO
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const todoContent = fs.readFileSync('TODO.md', 'utf8');
+            
+            // Parse TODO sections
+            const sections = {
+              'High Priority': /### High Priority\n([\s\S]*?)### Medium Priority/,
+              'Medium Priority': /### Medium Priority\n([\s\S]*?)### Low Priority/,
+              'Low Priority': /### Low Priority\n([\s\S]*?)## 🐛 Known Issues/,
+              'Known Issues': /## 🐛 Known Issues\n([\s\S]*?)## 🔒 Security & Compliance/,
+              'Security & Compliance': /## 🔒 Security & Compliance\n([\s\S]*?)## 📱 Features & Enhancements/,
+              'Features & Enhancements': /## 📱 Features & Enhancements\n([\s\S]*?)## 🚀 Deployment & DevOps/
+            };
+            
+            const selectedSection = '${{ github.event.inputs.section }}';
+            let content = '';
+            
+            if (selectedSection === 'All') {
+              content = todoContent;
+            } else {
+              const regex = sections[selectedSection];
+              const match = todoContent.match(regex);
+              content = match ? match[1] : '';
+            }
+            
+            // Extract uncompleted tasks (lines starting with - [ ])
+            const tasks = content.match(/^- \[ \] \*\*(.*?)\*\* - (.*?)$/gm) || 
+                         content.match(/^- \[ \] (.*?)$/gm) || [];
+            
+            const labels = {
+              'High Priority': ['high-priority', 'task'],
+              'Medium Priority': ['medium-priority', 'task'],
+              'Low Priority': ['low-priority', 'task'],
+              'Known Issues': ['bug', 'needs-triage'],
+              'Security & Compliance': ['security', 'compliance', 'task'],
+              'Features & Enhancements': ['enhancement', 'feature', 'task']
+            };
+            
+            // Create issues for each task
+            for (const task of tasks) {
+              const taskText = task.replace(/^- \[ \] \*\*(.*?)\*\* - /, '').replace(/^- \[ \] /, '');
+              const title = taskText.split(' - ')[0] || taskText.split('\n')[0];
+              const description = taskText.includes(' - ') ? taskText.split(' - ').slice(1).join(' - ') : '';
+              
+              const issueBody = `
+            ## 📋 Task Description
+            ${description || title}
+            
+            ## 📍 Source
+            This task was automatically created from TODO.md section: **${selectedSection}**
+            
+            ## ✅ Acceptance Criteria
+            - [ ] Task implementation completed
+            - [ ] Code reviewed and tested
+            - [ ] Documentation updated if needed
+            - [ ] TODO.md updated with ✅ status
+            
+            ## 🏷️ Labels
+            Priority: ${selectedSection}
+            
+            ---
+            *Auto-generated from TODO.md*
+              `;
+              
+              try {
+                const issue = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `[${selectedSection.toUpperCase()}] ${title}`,
+                  body: issueBody,
+                  labels: labels[selectedSection] || ['task']
+                });
+                
+                console.log(`Created issue: ${issue.data.html_url}`);
+              } catch (error) {
+                console.error(`Failed to create issue for: ${title}`, error);
+              }
+            }
+            
+            console.log(`Processed ${tasks.length} tasks from ${selectedSection} section`);

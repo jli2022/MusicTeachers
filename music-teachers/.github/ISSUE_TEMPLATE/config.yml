@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/your-username/music-teachers/blob/main/README.md
+    about: Check the documentation for setup and usage instructions
+  - name: 🚀 TODO List
+    url: https://github.com/your-username/music-teachers/blob/main/TODO.md
+    about: View our current TODO list and development roadmap
+  - name: 💬 Discussions
+    url: https://github.com/your-username/music-teachers/discussions
+    about: Ask questions and discuss ideas with the community

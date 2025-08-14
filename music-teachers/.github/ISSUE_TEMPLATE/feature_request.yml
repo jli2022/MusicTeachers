@@ -1,0 +1,105 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement for the Music Teachers Platform
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide details below to help us understand your request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see implemented.
+      placeholder: I would like to see...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to you?
+      options:
+        - High - Critical for my workflow
+        - Medium - Would significantly improve experience
+        - Low - Nice to have
+    validations:
+      required: true
+
+  - type: dropdown
+    id: user-type
+    attributes:
+      label: User Type
+      description: Which user type would benefit from this feature?
+      options:
+        - Teachers
+        - Employers
+        - Admins
+        - All Users
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What category does this feature fall under?
+      options:
+        - Authentication & Security
+        - User Interface & Design
+        - Job Management
+        - User Profiles
+        - Communication
+        - Analytics & Reporting
+        - Mobile Experience
+        - Performance
+        - Integration
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: Alternatively, we could...
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups/Examples
+      description: If you have mockups, wireframes, or examples from other platforms, please share them.
+      placeholder: Attach or describe visual examples...
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What would need to be true for this feature to be considered complete?
+      placeholder: |
+        - [ ] Users can...
+        - [ ] The system should...
+        - [ ] When..., then...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, technical considerations, or information about the feature request.
+      placeholder: Any additional information...

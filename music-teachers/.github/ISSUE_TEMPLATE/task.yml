@@ -1,0 +1,100 @@
+name: 📋 Task/Todo
+description: Create a task or todo item from the TODO.md file
+title: "[TASK] "
+labels: ["task", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Create a task to track work items from our TODO.md file or other development tasks.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Task Description
+      description: Describe what needs to be done
+      placeholder: Implement feature X, Fix issue Y, etc.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Task priority level
+      options:
+        - High Priority
+        - Medium Priority
+        - Low Priority
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What type of task is this?
+      options:
+        - Technical Improvements
+        - Bug Fix
+        - Features & Enhancements
+        - Security & Compliance
+        - Deployment & DevOps
+        - Documentation
+        - Testing
+        - UI/UX
+        - Performance
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this task is?
+      options:
+        - Simple (1-2 hours)
+        - Medium (1-2 days)
+        - Complex (3-5 days)
+        - Large (1+ weeks)
+    validations:
+      required: false
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements/Acceptance Criteria
+      description: What needs to be completed for this task to be done?
+      placeholder: |
+        - [ ] Requirement 1
+        - [ ] Requirement 2
+        - [ ] Testing completed
+        - [ ] Documentation updated
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Technical Notes
+      description: Any technical considerations, dependencies, or implementation notes
+      placeholder: Dependencies, technical approach, etc.
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources/References
+      description: Links to documentation, examples, or related issues
+      placeholder: Links to docs, examples, related issues...
+
+  - type: checkboxes
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Does this task depend on other work?
+      options:
+        - label: This task has dependencies on other issues
+        - label: This task blocks other work
+        - label: This task requires environment setup
+        - label: This task requires external resources

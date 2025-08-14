@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  TEACHER
+  EMPLOYER
+  ADMIN
+}
+
+enum JobType {
+  PRIVATE_LESSON
+  GROUP_LESSON
+  SCHOOL_POSITION
+  SUBSTITUTE
+  ENSEMBLE
+  OTHER
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  role          UserRole?
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  isActive      Boolean   @default(true)
+  approvedBy    String?   // Admin who approved this user
+
+  accounts Account[]
+  sessions Session[]
+
+  // Teacher specific fields
+  teacher       Teacher?
+  
+  // Employer specific fields  
+  employer      Employer?
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model Teacher {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  phone           String?
+  address         String?
+  wwcNumber       String?
+  wwcExpiry       DateTime?
+  dateOfBirth     DateTime?
+  instruments     String[] // Array of instruments
+  qualifications  String?
+  experience      String?
+  profilePicture  String?
+  rating          Float?   @default(0)
+  totalRatings    Int      @default(0)
+  
+  applications    Application[]
+  ratings         Rating[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("teachers")
+}
+
+model Employer {
+  id            String @id @default(cuid())
+  userId        String @unique
+  user          User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  phone         String?
+  organization  String?
+  address       String?
+  
+  jobs          Job[]
+  ratings       Rating[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("employers")
+}
+
+model Job {
+  id           String    @id @default(cuid())
+  employerId   String
+  employer     Employer  @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  
+  title        String
+  description  String
+  jobType      JobType
+  instruments  String[]  // Array of instruments needed
+  startDate    DateTime
+  endDate      DateTime?
+  payRate      Decimal   @db.Decimal(10, 2)
+  location     String
+  isActive     Boolean   @default(true)
+  
+  applications Application[]
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("jobs")
+}
+
+model Application {
+  id        String            @id @default(cuid())
+  jobId     String
+  job       Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  teacherId String
+  teacher   Teacher           @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  
+  status    ApplicationStatus @default(PENDING)
+  message   String?
+  
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@unique([jobId, teacherId])
+  @@map("applications")
+}
+
+model Rating {
+  id         String   @id @default(cuid())
+  teacherId  String
+  teacher    Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  employerId String
+  employer   Employer @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  
+  rating     Int      @db.SmallInt // 1-5 stars
+  comment    String?
+  
+  createdAt  DateTime @default(now())
+
+  @@map("ratings")
+}
