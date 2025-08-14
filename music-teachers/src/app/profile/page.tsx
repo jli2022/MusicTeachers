@@ -15,6 +15,9 @@ interface TeacherProfile {
   instruments: string[]
   qualifications?: string
   experience?: string
+  rating?: number
+  totalRatings?: number
+  createdAt: string
   user: {
     name: string
     email: string
@@ -148,7 +151,7 @@ export default function TeacherProfile() {
         setSuccess('Profile updated successfully!')
         
         // Update session if name changed
-        if (formData.name !== session?.user.name) {
+        if (formData.name !== session?.user.name && session) {
           await update({
             ...session,
             user: {
@@ -401,7 +404,7 @@ export default function TeacherProfile() {
                   <div>
                     <span className="font-medium">Rating:</span>
                     <p className="text-gray-600">
-                      {profile.rating && profile.totalRatings > 0
+                      {profile.rating && profile.totalRatings && profile.totalRatings > 0
                         ? `${profile.rating.toFixed(1)}/5 (${profile.totalRatings} reviews)`
                         : 'No ratings yet'}
                     </p>
