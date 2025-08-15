@@ -27,7 +27,8 @@ This is a **Music Teacher Jobs & Substitutes Platform** that connects music teac
 
 ## Documentation Structure
 
-- **Root Level**: `README.md`, `Spec.Features.md`, `DEMO_USERS_SETUP.md`, `CLAUDE.md`
+- **Root Level**: `README.md`, `CLAUDE.md` (minimal, essential only)
+- **docs/spec/**: Specifications and reference materials
 - **docs/setup/**: Environment setup, OAuth configuration, deployment guides
 - **docs/implementation/**: Technical implementation details, workflows
 - **docs/archive/**: Historical logs and outdated documentation
@@ -83,7 +84,7 @@ This is a **Music Teacher Jobs & Substitutes Platform** that connects music teac
 ## Important Notes for Claude
 
 1. **Approval System**: All new teacher registrations are PENDING by default
-2. **Demo Data**: Use DEMO_USERS_SETUP.md for testing - contains proper bcrypt hashes
+2. **Demo Data**: Use `docs/spec/DEMO_USERS_SETUP.md` for testing - contains proper bcrypt hashes
 3. **TypeScript**: Use `as any` for approval system fields due to Prisma schema limitations
 4. **Environment**: Production uses environment variables for feature flags
 5. **Database**: Supabase PostgreSQL with connection pooling in production
@@ -93,12 +94,12 @@ This is a **Music Teacher Jobs & Substitutes Platform** that connects music teac
 1. Clone repo and checkout develop branch
 2. Copy `.env.example` to `.env.local` and configure
 3. Run `npm install` and `npx prisma generate`
-4. Use demo users from DEMO_USERS_SETUP.md for testing
+4. Use demo users from `docs/spec/DEMO_USERS_SETUP.md` for testing
 5. Admin access: admin@musicteachers.com / admin123
 
 ## References
 
-- Feature specifications: `Spec.Features.md`
-- Demo setup: `DEMO_USERS_SETUP.md`
+- Feature specifications: `docs/spec/Spec.Features.md`
+- Demo setup: `docs/spec/DEMO_USERS_SETUP.md`
 - Implementation details: `docs/implementation/`
 - Setup guides: `docs/setup/`
