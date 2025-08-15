@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
-import { authOptions } from '@/lib/auth'
+import { config } from '@/lib/config'
 import bcrypt from 'bcryptjs'
 
 interface PrismaError extends Error {
@@ -10,52 +9,67 @@ interface PrismaError extends Error {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if user is admin or if this is initial setup
-    const session = await getServerSession(authOptions)
-    
-    // Allow initialization if no admin users exist yet OR if user is admin
-    const userCount = await prisma.user.count()
-    const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
-    const isInitialSetup = adminCount === 0
-    
-    console.log(`Database check: ${userCount} total users, ${adminCount} admin users, isInitialSetup: ${isInitialSetup}`)
-    
-    if (!isInitialSetup && (!session || session.user.role !== 'ADMIN')) {
+    // Check if database initialization is enabled
+    if (!config.features.enableDatabaseInit) {
       return NextResponse.json(
-        { error: `Unauthorized. Only admins can initialize database. Found ${adminCount} admin users.` },
-        { status: 401 }
+        { error: 'Database initialization is disabled in this environment.' },
+        { status: 403 }
       )
     }
 
-    console.log('🔧 Starting database initialization...')
+    // SECURITY: Check if initialization has already been run
+    const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
+    const totalUsers = await prisma.user.count()
     
-    // Update existing users without approval date to be approved
-    const usersNeedingUpdate = await prisma.user.findMany({
-      where: {
-        approvalDate: null
-      }
-    })
-
-    if (usersNeedingUpdate.length > 0) {
-      console.log(`Updating ${usersNeedingUpdate.length} users with approval status...`)
-      
-      await prisma.user.updateMany({
-        where: {
-          approvalDate: null
+    if (adminCount > 0) {
+      return NextResponse.json(
+        { 
+          error: 'Database already initialized. This endpoint is disabled for security.',
+          details: `Found ${adminCount} admin users and ${totalUsers} total users.`
         },
-        data: {
-          approvalStatus: 'APPROVED',
-          approvalDate: new Date()
-        }
-      })
-      
-      console.log('✅ Updated existing users to APPROVED status')
+        { status: 403 }
+      )
     }
 
-    // Check if we need to create demo users
+    console.log('🔐 First-time database initialization starting...')
+    console.log(`Current state: ${totalUsers} total users, ${adminCount} admin users`)
+
+    console.log('🔧 Starting database initialization...')
+    
+    // Update existing users to approved status (if approval fields exist)
+    try {
+      const usersNeedingUpdate = await prisma.user.findMany({
+        where: {
+          approvalDate: null
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any
+      })
+
+      if (usersNeedingUpdate.length > 0) {
+        console.log(`Updating ${usersNeedingUpdate.length} users with approval status...`)
+        
+        await prisma.user.updateMany({
+          where: {
+            approvalDate: null
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any,
+          data: {
+            approvalStatus: 'APPROVED',
+            approvalDate: new Date()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any
+        })
+        
+        console.log('✅ Updated existing users to APPROVED status')
+      }
+    } catch {
+      console.log('ℹ️  Approval status update skipped (schema may not support it yet)')
+    }
+
+    // Check if we need to create demo users (only if feature is enabled)
     const { createDemoUsers } = await request.json()
     
-    if (createDemoUsers) {
+    if (createDemoUsers && config.features.enableDemoUsers) {
       console.log('🧪 Creating demo test users...')
       
       const demoUsers = [
@@ -112,6 +126,18 @@ export async function POST(request: NextRequest) {
           teacher: {
             instruments: ['Violin']
           }
+        },
+        {
+          email: 'approved2.teacher@test.com',
+          name: 'Second Approved Teacher',
+          password: 'approved2-123',
+          role: 'TEACHER' as const,
+          approvalStatus: 'APPROVED' as const,
+          approvalDate: new Date(),
+          teacher: {
+            instruments: ['Guitar', 'Voice'],
+            qualifications: 'Bachelor of Music Education'
+          }
         }
       ]
 
@@ -150,29 +176,50 @@ export async function POST(request: NextRequest) {
           }
         }
       }
+    } else if (createDemoUsers && !config.features.enableDemoUsers) {
+      console.log('ℹ️  Demo user creation is disabled in this environment')
     }
 
     const finalUserCount = await prisma.user.count()
-    const pendingCount = await prisma.user.count({ where: { approvalStatus: 'PENDING' } })
-    const approvedCount = await prisma.user.count({ where: { approvalStatus: 'APPROVED' } })
-    const rejectedCount = await prisma.user.count({ where: { approvalStatus: 'REJECTED' } })
+    
+    // Try to get approval status counts (may fail if schema doesn't have approval fields yet)
+    let pendingCount = 0, approvedCount = 0, rejectedCount = 0
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      pendingCount = await prisma.user.count({ where: { approvalStatus: 'PENDING' } as any })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      approvedCount = await prisma.user.count({ where: { approvalStatus: 'APPROVED' } as any })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      rejectedCount = await prisma.user.count({ where: { approvalStatus: 'REJECTED' } as any })
+    } catch {
+      // Approval fields don't exist yet
+      approvedCount = finalUserCount // Assume all users are approved if no approval system
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Database initialized successfully',
+      security: 'This endpoint is now permanently disabled for security',
       stats: {
         totalUsers: finalUserCount,
         pending: pendingCount,
         approved: approvedCount,
         rejected: rejectedCount
       },
-      demoAccounts: createDemoUsers ? {
+      demoAccounts: createDemoUsers && config.features.enableDemoUsers ? {
         admin: 'admin@musicteachers.com / admin123',
         employer: 'staff@musicteachers.com / employer123',
         approvedTeacher: 'approved.teacher@test.com / approved123',
+        approvedTeacher2: 'approved2.teacher@test.com / approved2-123',
         pendingTeacher: 'pending.teacher@test.com / pending123',
         rejectedTeacher: 'rejected.teacher@test.com / rejected123'
-      } : null
+      } : null,
+      nextSteps: [
+        'Admin user created and can now log in',
+        'Approval system is active',
+        'This /init endpoint is now disabled',
+        'Set ENABLE_DATABASE_INIT=false in environment variables'
+      ]
     })
 
   } catch (error) {

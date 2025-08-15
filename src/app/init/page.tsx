@@ -16,6 +16,7 @@ export default function InitDatabase() {
       admin: string;
       employer: string;
       approvedTeacher: string;
+      approvedTeacher2: string;
       pendingTeacher: string;
       rejectedTeacher: string;
     };
@@ -57,6 +58,15 @@ export default function InitDatabase() {
           <h1 className="text-2xl font-bold text-gray-900 mb-6">
             🔧 Database Initialization
           </h1>
+          
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+            <div className="flex">
+              <div className="text-yellow-800">
+                <h3 className="text-sm font-medium">⚠️ Security Notice</h3>
+                <p className="mt-1 text-sm">This endpoint runs only ONCE for initial setup, then permanently disables itself for security.</p>
+              </div>
+            </div>
+          </div>
           
           <p className="text-gray-600 mb-8">
             Initialize the production database with approval system fields and optionally create demo users for testing the approval workflow.
@@ -111,7 +121,8 @@ export default function InitDatabase() {
                       <ul className="list-disc list-inside ml-4">
                         <li>Admin: {result.demoAccounts.admin}</li>
                         <li>Employer: {result.demoAccounts.employer}</li>
-                        <li>Approved Teacher: {result.demoAccounts.approvedTeacher}</li>
+                        <li>Approved Teacher 1: {result.demoAccounts.approvedTeacher}</li>
+                        <li>Approved Teacher 2: {result.demoAccounts.approvedTeacher2}</li>
                         <li>Pending Teacher: {result.demoAccounts.pendingTeacher}</li>
                         <li>Rejected Teacher: {result.demoAccounts.rejectedTeacher}</li>
                       </ul>

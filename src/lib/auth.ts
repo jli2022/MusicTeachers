@@ -49,11 +49,13 @@ const buildProviders = () => {
           throw new Error('Account is not active. Please contact an administrator.')
         }
 
-        if (user.approvalStatus === 'PENDING') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((user as any).approvalStatus === 'PENDING') {
           throw new Error('Your account is pending approval. Please wait for administrator approval.')
         }
 
-        if (user.approvalStatus === 'REJECTED') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((user as any).approvalStatus === 'REJECTED') {
           throw new Error('Your account registration has been rejected. Please contact an administrator.')
         }
 
@@ -113,7 +115,8 @@ export const authOptions: NextAuthOptions = {
               role: 'TEACHER',
               isActive: true,
               approvalStatus: 'PENDING'
-            }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any
           })
           
           // Create teacher profile
@@ -129,7 +132,8 @@ export const authOptions: NextAuthOptions = {
         } else {
           token.role = dbUser?.role || undefined
           token.isActive = dbUser?.isActive || false
-          token.approvalStatus = dbUser?.approvalStatus || undefined
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          token.approvalStatus = (dbUser as any)?.approvalStatus || undefined
         }
       }
       return token

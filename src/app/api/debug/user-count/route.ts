@@ -11,7 +11,8 @@ export async function GET() {
         role: true,
         approvalStatus: true,
         createdAt: true
-      },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
       take: 10
     })
     

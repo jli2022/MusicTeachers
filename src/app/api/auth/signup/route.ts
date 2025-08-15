@@ -46,7 +46,8 @@ export async function POST(request: NextRequest) {
         role: 'TEACHER',
         isActive: true,
         approvalStatus: 'PENDING'
-      }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any
     })
 
     // Create teacher profile

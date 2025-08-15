@@ -27,9 +27,11 @@ export async function GET() {
         approvalStatus: true,
         approvalDate: true,
         rejectionReason: true
-      },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
       orderBy: [
-        { approvalStatus: 'asc' }, // PENDING first
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { approvalStatus: 'asc' } as any, // PENDING first
         { createdAt: 'desc' }
       ]
     })
@@ -84,7 +86,8 @@ export async function POST(request: NextRequest) {
         approvedBy: session.user.id,
         approvalDate: new Date(),
         emailVerified: new Date()
-      }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any
     })
 
     // Create role-specific profiles

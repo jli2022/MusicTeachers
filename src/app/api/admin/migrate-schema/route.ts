@@ -47,7 +47,8 @@ export async function POST() {
         approvedBy: true,
         approvalDate: true,
         rejectionReason: true
-      },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
       take: 1
     })
     
