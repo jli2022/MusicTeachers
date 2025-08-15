@@ -5,91 +5,100 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 This is a **Music Teacher Jobs & Substitutes Platform** that connects music teachers with employment opportunities. The platform serves two main user types:
-- **Teachers**: Create profiles, apply for positions, manage availability
+- **Teachers**: Create profiles, apply for positions, manage availability  
 - **Employers**: Post job listings, review applications, hire teachers
 
-## Core Architecture
+## Current Status (August 2025)
 
-The platform is built around these key domains:
+✅ **Production Ready** - Deployed at https://music-teachers.vercel.app
+✅ **Complete Approval System** - Teachers require admin approval before accessing platform
+✅ **Demo Users Available** - See DEMO_USERS_SETUP.md for login credentials
+✅ **Admin Dashboard** - Full user management at `/admin`
 
-### User Management & Authentication
-- Dual user types (Teachers/Employers) with role-based access
-- Secure authentication with email verification
-- WWC (Working With Children) compliance verification system
+## Technical Stack
 
-### Job Management System
-- Two job types: Fill-In (temporary) and Permanent positions
-- Application workflow: Post → Apply → Accept → Confirm
-- Automated email notifications and calendar integration
+- **Framework**: Next.js 15 with App Router
+- **Database**: PostgreSQL via Prisma ORM + Supabase  
+- **Authentication**: NextAuth.js with Google OAuth + credentials
+- **Authorization**: Role-based (ADMIN/EMPLOYER/TEACHER) + Approval System
+- **Styling**: Tailwind CSS
+- **Deployment**: Vercel
+- **File Storage**: (To be implemented)
 
-### Profile & Verification System
-- Teacher profiles with instruments, qualifications, and experience
-- Mandatory WWC verification with automated expiry tracking
-- Rating system for post-job feedback
+## Documentation Structure
 
-### Search & Filtering
-- Multi-criteria search (instrument, location, date, pay rate)
-- Notification preferences (email/SMS)
-- Calendar and list view options
+- **Root Level**: `README.md`, `Spec.Features.md`, `DEMO_USERS_SETUP.md`, `CLAUDE.md`
+- **docs/setup/**: Environment setup, OAuth configuration, deployment guides
+- **docs/implementation/**: Technical implementation details, workflows
+- **docs/archive/**: Historical logs and outdated documentation
 
-## Key Features to Implement
+## Key Features Implemented
 
-### Security & Compliance
-- End-to-end encryption for personal data
-- WWC database integration for verification
-- Automated compliance monitoring and alerts
+### Authentication & Authorization
+- ✅ NextAuth.js with credentials and Google OAuth
+- ✅ Role-based access (ADMIN, EMPLOYER, TEACHER)
+- ✅ Teacher approval workflow (PENDING/APPROVED/REJECTED)
+- ✅ Session management and protected routes
 
-### Core Workflows
-1. **Teacher Registration**: Profile creation → WWC verification → Account activation
-2. **Job Posting**: Create listing → Receive applications → Accept candidate → Job confirmation
-3. **Application Process**: Search jobs → Apply → Receive acceptance → Complete job details
+### User Management
+- ✅ Admin dashboard for user approval/rejection
+- ✅ Teacher and employer profile creation
+- ✅ Demo users for testing all scenarios
+- ✅ Password hashing with bcrypt
 
-### Administrative Features
-- User management (approve, suspend, block)
-- Job post moderation
-- Analytics dashboard with engagement metrics
-- Automated WWC expiry warnings
+### Database Schema
+- ✅ User model with approval system fields
+- ✅ Teacher profiles with instruments and qualifications
+- ✅ Employer profiles with organization details
+- ✅ Jobs and applications models (basic structure)
+- ✅ Proper foreign key relationships
 
-## Development Notes
+### UI Components
+- ✅ Responsive design with Tailwind CSS
+- ✅ Login/signup flows for different user types
+- ✅ Admin approval interface with modal dialogs
+- ✅ Dashboard layouts for different roles
 
-This appears to be a greenfield project with only feature specifications available. The codebase will need to be built from scratch following the requirements in `Spec.Feataures.md`.
+## Key Features To Implement
 
-### Key Integration Requirements
-- WWC database API integration
-- Email service for notifications
-- SMS service for alerts
-- Calendar system integration
-- Payment processing system
+### Job Management
+- Job posting interface for employers
+- Job application system for teachers
+- Application review and hiring workflow
+- Calendar integration for scheduling
 
-### Compliance Considerations
-- Data protection and privacy regulations
-- Working with Children check requirements
-- Educational institution compliance standards
+### Advanced Features
+- WWC verification system (partially implemented)
+- Rating and review system
+- Email notifications
+- Advanced search and filtering
+- Payment integration
 
-## Recommended Technical Stack
+## Development Workflow
 
-### Frontend
-- **Next.js 15** with App Router + TypeScript
-- **Tailwind CSS** + shadcn/ui for UI components
-- Server-side rendering for SEO optimization
+- **Main Branch**: Production-ready code, auto-deploys to Vercel
+- **Develop Branch**: Active development, aligned with main
+- **Feature Branches**: No longer used - work directly on develop
 
-### Backend
-- **Next.js API Routes** for backend functionality
-- **PostgreSQL** (RDS) for database
-- **Prisma** ORM for type-safe database operations
+## Important Notes for Claude
 
-### Authentication & Security
-- **Auth0** or **Supabase Auth** for user management
-- Role-based access control (teachers vs employers)
-- **bcrypt** for password hashing
+1. **Approval System**: All new teacher registrations are PENDING by default
+2. **Demo Data**: Use DEMO_USERS_SETUP.md for testing - contains proper bcrypt hashes
+3. **TypeScript**: Use `as any` for approval system fields due to Prisma schema limitations
+4. **Environment**: Production uses environment variables for feature flags
+5. **Database**: Supabase PostgreSQL with connection pooling in production
 
-### Infrastructure
-- **AWS RDS** for PostgreSQL database
-- **Vercel** for deployment and hosting
-- **AWS S3** for file storage (WWC documents, profiles)
+## Quick Start for Development
 
-### Third-party Services
-- **SendGrid/AWS SES** for email notifications
-- **Twilio** for SMS alerts
-- **Google Calendar API** for scheduling
-- **Stripe** for payment processing
+1. Clone repo and checkout develop branch
+2. Copy `.env.example` to `.env.local` and configure
+3. Run `npm install` and `npx prisma generate`
+4. Use demo users from DEMO_USERS_SETUP.md for testing
+5. Admin access: admin@musicteachers.com / admin123
+
+## References
+
+- Feature specifications: `Spec.Features.md`
+- Demo setup: `DEMO_USERS_SETUP.md`
+- Implementation details: `docs/implementation/`
+- Setup guides: `docs/setup/`
