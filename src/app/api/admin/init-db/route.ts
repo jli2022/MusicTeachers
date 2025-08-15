@@ -10,16 +10,22 @@ interface PrismaError extends Error {
 export async function POST(request: NextRequest) {
   try {
     // Check if database initialization is enabled
-    if (!config.features.enableDatabaseInit) {
+    // Allow in development or when explicitly enabled, or when no admin users exist (first-time setup)
+    const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
+    const isFirstTimeSetup = adminCount === 0
+    
+    if (!config.features.enableDatabaseInit && !isFirstTimeSetup) {
       return NextResponse.json(
-        { error: 'Database initialization is disabled in this environment.' },
+        { 
+          error: 'Database initialization is disabled in this environment.',
+          hint: 'Set ENABLE_DATABASE_INIT=true environment variable to enable initialization'
+        },
         { status: 403 }
       )
     }
 
     // SECURITY: Check if initialization has already been run
     // Only disable if approval system is already fully set up
-    const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
     const totalUsers = await prisma.user.count()
     
     // Check if approval system is already initialized by looking for users with approval status
