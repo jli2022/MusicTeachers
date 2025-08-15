@@ -18,23 +18,41 @@ export async function POST(request: NextRequest) {
     }
 
     // SECURITY: Check if initialization has already been run
+    // Only disable if approval system is already fully set up
     const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
     const totalUsers = await prisma.user.count()
     
-    if (adminCount > 0) {
+    // Check if approval system is already initialized by looking for users with approval status
+    let approvalSystemInitialized = false
+    try {
+      const usersWithApprovalStatus = await prisma.user.count({ 
+        where: { approvalStatus: { not: null } } 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+      approvalSystemInitialized = usersWithApprovalStatus > 0 && adminCount > 0
+    } catch {
+      // Approval fields don't exist yet, so system is not initialized
+      approvalSystemInitialized = false
+    }
+    
+    if (approvalSystemInitialized) {
       return NextResponse.json(
         { 
-          error: 'Database already initialized. This endpoint is disabled for security.',
-          details: `Found ${adminCount} admin users and ${totalUsers} total users.`
+          error: 'Approval system already initialized. This endpoint is disabled for security.',
+          details: `Found ${adminCount} admin users with approval system active.`
         },
         { status: 403 }
       )
     }
 
-    console.log('🔐 First-time database initialization starting...')
+    console.log('🔧 Database initialization starting...')
     console.log(`Current state: ${totalUsers} total users, ${adminCount} admin users`)
-
-    console.log('🔧 Starting database initialization...')
+    
+    if (adminCount > 0) {
+      console.log('ℹ️  Admin users exist - updating existing users with approval system')
+    } else {
+      console.log('🔐 First-time setup - will create admin and demo users')
+    }
     
     // Update existing users to approved status (if approval fields exist)
     try {
@@ -196,10 +214,12 @@ export async function POST(request: NextRequest) {
       approvedCount = finalUserCount // Assume all users are approved if no approval system
     }
 
+    const wasFirstTimeSetup = adminCount === 0
+    
     return NextResponse.json({
       success: true,
-      message: 'Database initialized successfully',
-      security: 'This endpoint is now permanently disabled for security',
+      message: wasFirstTimeSetup ? 'Database initialized successfully' : 'Approval system added to existing database',
+      security: 'This endpoint will be disabled after approval system is active',
       stats: {
         totalUsers: finalUserCount,
         pending: pendingCount,
@@ -214,11 +234,16 @@ export async function POST(request: NextRequest) {
         pendingTeacher: 'pending.teacher@test.com / pending123',
         rejectedTeacher: 'rejected.teacher@test.com / rejected123'
       } : null,
-      nextSteps: [
+      nextSteps: wasFirstTimeSetup ? [
         'Admin user created and can now log in',
         'Approval system is active',
         'This /init endpoint is now disabled',
-        'Set ENABLE_DATABASE_INIT=false in environment variables'
+        'Access admin panel at /admin'
+      ] : [
+        'Existing users updated with approval system',
+        'All existing users set to APPROVED status',
+        'Demo users created for testing',
+        'Access admin panel at /admin to manage approvals'
       ]
     })
 
