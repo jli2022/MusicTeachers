@@ -189,6 +189,35 @@ export default function TeacherLogin() {
           </div>
         </form>
 
+        {/* Demo Credentials */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-sm font-medium text-gray-900 mb-3">Demo Teacher Accounts:</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+              <span className="font-medium text-green-700">Approved Teacher 1:</span>
+              <span className="text-green-600">approved.teacher@test.com</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+              <span className="font-medium text-green-700">Approved Teacher 2:</span>
+              <span className="text-green-600">approved2.teacher@test.com</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-yellow-50 rounded">
+              <span className="font-medium text-yellow-700">Pending Teacher:</span>
+              <span className="text-yellow-600">pending.teacher@test.com</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-red-50 rounded">
+              <span className="font-medium text-red-700">Rejected Teacher:</span>
+              <span className="text-red-600">rejected.teacher@test.com</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Passwords: approved123 | approved2-123 | pending123 | rejected123
+            </p>
+            <p className="text-xs text-amber-600 mt-1">
+              Note: Only approved teachers can log in successfully
+            </p>
+          </div>
+        </div>
+
         {/* Footer Links */}
         <div className="text-center space-y-2">
           <p className="text-sm text-gray-600">
