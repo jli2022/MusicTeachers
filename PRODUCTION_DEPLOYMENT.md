@@ -43,20 +43,42 @@ git merge feature/production-ready-approval-system
 git push origin main
 ```
 
-### 3. Database Setup (Automatic)
+### 3. Deploy to Production
 
-The deployment will automatically:
-- Run `prisma migrate deploy` to apply schema changes
-- Run `npm run db:seed` to create the admin user
-- Build and deploy the application
+The deployment process:
+- Builds the application (no database operations during build)
+- Application becomes available immediately
+- Database setup happens separately (see step 4)
 
-### 4. Verify Deployment
+### 4. Database Setup (Manual - One Time)
+
+After successful deployment, run the database setup:
+
+**Option A: Use the API endpoint (if enabled)**
+```bash
+curl -X POST https://your-app.vercel.app/api/admin/init-db \
+  -H "Content-Type: application/json" \
+  -d '{"createDemoUsers": false}'
+```
+
+**Option B: Run post-deploy script locally**
+```bash
+npm run post-deploy
+```
+
+**Option C: Manual migration (most reliable)**
+```bash
+npx prisma migrate deploy
+npm run db:seed
+```
+
+### 5. Verify Deployment
 
 1. **Check Admin User**: Try logging in with your admin credentials
 2. **Test Approval System**: Go to `/admin` to verify the approval dashboard works
 3. **Check Features**: Ensure demo users are disabled in production
 
-### 5. Post-Deployment Security
+### 6. Post-Deployment Security
 
 After successful deployment:
 
