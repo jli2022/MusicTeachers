@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { validateWWC, getWWCStatusDisplay, WWC_FORMATS, type WWCValidation } from '@/lib/wwc-validation'
+import { QUICK_TEST_SCENARIOS } from '@/lib/wwc-test-data'
 
 interface WWCInputProps {
   wwcNumber: string
@@ -92,14 +93,38 @@ export default function WWCInput({
         {/* Format Examples */}
         {showFormats && (
           <div className="mt-2 p-3 bg-gray-50 rounded-md">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">Australian WWC Formats:</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+            <h4 className="text-sm font-medium text-gray-900 mb-3">Australian WWC Formats:</h4>
+            
+            {/* Format Examples */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs mb-4">
               {WWC_FORMATS.map((format) => (
                 <div key={format.state} className="flex justify-between">
                   <span className="font-medium">{format.state}:</span>
                   <span className="text-gray-600">{format.example}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Test Data Examples */}
+            <div className="border-t pt-3 mt-3">
+              <h5 className="text-sm font-medium text-gray-900 mb-2">Test Data Examples:</h5>
+              <div className="space-y-2 text-xs">
+                <div className="bg-green-50 border border-green-200 rounded p-2">
+                  <div className="font-medium text-green-800">✓ Valid Active:</div>
+                  <div className="text-green-700">{QUICK_TEST_SCENARIOS.valid_active.wwcNumber}</div>
+                  <div className="text-green-600 text-xs">Expiry: {QUICK_TEST_SCENARIOS.valid_active.expiryDate}</div>
+                </div>
+                <div className="bg-yellow-50 border border-yellow-200 rounded p-2">
+                  <div className="font-medium text-yellow-800">⚠ Expiring Soon:</div>
+                  <div className="text-yellow-700">{QUICK_TEST_SCENARIOS.valid_expiring.wwcNumber}</div>
+                  <div className="text-yellow-600 text-xs">Expiry: {QUICK_TEST_SCENARIOS.valid_expiring.expiryDate}</div>
+                </div>
+                <div className="bg-red-50 border border-red-200 rounded p-2">
+                  <div className="font-medium text-red-800">✗ Recently Expired:</div>
+                  <div className="text-red-700">{QUICK_TEST_SCENARIOS.recently_expired.wwcNumber}</div>
+                  <div className="text-red-600 text-xs">Expiry: {QUICK_TEST_SCENARIOS.recently_expired.expiryDate}</div>
+                </div>
+              </div>
             </div>
           </div>
         )}
